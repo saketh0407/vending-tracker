@@ -1,37 +1,46 @@
-const apiUrl = "http://localhost:3000/api";
+// ✅ Change this to your Render API base URL
+// Example: const apiUrl = "https://vending-tracker.onrender.com/api";
+const apiUrl = "https://YOUR-RENDER-BACKEND-URL/api";
 
 // --- Load Items ---
 async function loadItems() {
-  const res = await fetch(`${apiUrl}/items`);
-  const items = await res.json();
-  const itemList = document.getElementById("item-list");
-  itemList.innerHTML = "";
+  try {
+    const res = await fetch(`${apiUrl}/items`);
+    if (!res.ok) throw new Error("Failed to load items");
+    const items = await res.json();
 
-  items.forEach((item) => {
-    const div = document.createElement("div");
-    div.textContent = `${item.name} ($${item.price}) - Stock: ${item.stock}`;
+    const itemList = document.getElementById("item-list");
+    itemList.innerHTML = "";
 
-    // Delete button
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Delete";
-    delBtn.onclick = async () => {
-      await fetch(`${apiUrl}/items/${item._id}`, { method: "DELETE" });
-      loadItems();
-    };
+    items.forEach((item) => {
+      const div = document.createElement("div");
+      div.textContent = `${item.name} ($${item.price}) - Stock: ${item.stock}`;
 
-    div.appendChild(delBtn);
-    itemList.appendChild(div);
-  });
+      // Delete button
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "Delete";
+      delBtn.onclick = async () => {
+        await fetch(`${apiUrl}/items/${item._id}`, { method: "DELETE" });
+        loadItems();
+      };
 
-  // Update Sales dropdown
-  const itemSelect = document.getElementById("sale-item");
-  itemSelect.innerHTML = "";
-  items.forEach((item) => {
-    const option = document.createElement("option");
-    option.value = item._id;
-    option.textContent = `${item.name} ($${item.price}) - Stock: ${item.stock}`;
-    itemSelect.appendChild(option);
-  });
+      div.appendChild(delBtn);
+      itemList.appendChild(div);
+    });
+
+    // Update Sales dropdown
+    const itemSelect = document.getElementById("sale-item");
+    itemSelect.innerHTML = "";
+    items.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item._id;
+      option.textContent = `${item.name} ($${item.price}) - Stock: ${item.stock}`;
+      itemSelect.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Error loading items:", err);
+    alert("Failed to load items. Please check backend connection.");
+  }
 }
 
 // --- Add Item ---
@@ -45,17 +54,25 @@ async function addItem() {
     return;
   }
 
-  await fetch(`${apiUrl}/items`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, price, stock }),
-  });
+  try {
+    const res = await fetch(`${apiUrl}/items`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, price: parseFloat(price), stock: parseInt(stock) }),
+    });
 
-  document.getElementById("item-name").value = "";
-  document.getElementById("item-price").value = "";
-  document.getElementById("item-stock").value = "";
+    if (!res.ok) throw new Error("Failed to add item");
+    await res.json();
 
-  loadItems();
+    document.getElementById("item-name").value = "";
+    document.getElementById("item-price").value = "";
+    document.getElementById("item-stock").value = "";
+
+    await loadItems();
+  } catch (err) {
+    console.error(err);
+    alert("Error adding item. Please try again.");
+  }
 }
 
 // --- Record Sale ---
@@ -70,22 +87,28 @@ async function recordSale() {
     return;
   }
 
-  const res = await fetch(`${apiUrl}/sales`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ itemId, quantity, paymentType, buyerType }),
-  });
+  try {
+    const res = await fetch(`${apiUrl}/sales`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ itemId, quantity: parseInt(quantity), paymentType, buyerType }),
+    });
 
-  const data = await res.json();
-  if (data.error) {
-    alert(data.error);
-  } else {
-    alert("Sale recorded successfully!");
-    document.getElementById("sale-qty").value = "";
-    loadItems();
+    const data = await res.json();
+    if (data.error) {
+      alert(data.error);
+    } else {
+      alert("✅ Sale recorded successfully!");
+      document.getElementById("sale-qty").value = "";
+      await loadItems();
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error recording sale. Please check connection.");
   }
 }
 
+// --- Download Report ---
 async function downloadReport(type) {
   const startDate = document.getElementById("start-date").value;
   const endDate = document.getElementById("end-date").value;
@@ -95,6 +118,8 @@ async function downloadReport(type) {
     return;
   }
 
-  window.location.href = `/api/reports/${type}?start=${startDate}&end=${endDate}`;
+  window.location.href = `${apiUrl}/reports/${type}?start=${startDate}&end=${endDate}`;
 }
 
+// Load items on page load
+window.onload = loadItems;
