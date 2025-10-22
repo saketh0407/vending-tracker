@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Motel POS Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h1>Motel POS Tracker</h1>
+
+  <!-- INVENTORY SECTION -->
+  <section id="inventory">
+    <h2>Inventory</h2>
+
+    <!-- Item List -->
+    <div id="item-list"></div>
+
+    <!-- Add New Item Form -->
+    <div id="add-item-form">
+      <h3>Add New Item</h3>
+      <input id="item-name" placeholder="Item Name" />
+      <input id="item-price" type="number" placeholder="Price" />
+      <input id="item-stock" type="number" placeholder="Stock" />
+      <button onclick="addItem()">Add Item</button>
+    </div>
+  </section>
+
+  <!-- SALES SECTION -->
+  <section id="sales">
+    <h2>Sales</h2>
+    <select id="sale-item"></select>
+    <input id="sale-qty" type="number" placeholder="Quantity" />
+    <select id="payment-type">
+      <option value="cash">Cash</option>
+      <option value="card">Card</option>
+    </select>
+    <select id="buyer-type">
+      <option value="Customer">Customer</option>
+      <option value="Staff">Staff</option>
+      <option value="Owner">Owner</option>
+    </select>
+    <button onclick="recordSale()">Record Sale</button>
+    <div id="sales-list"></div>
+  </section>
+
+  <section id="reports">
+  <h2>Reports</h2>
+  <label>Start Date:</label>
+  <input type="date" id="start-date" />
+  <label>End Date:</label>
+  <input type="date" id="end-date" />
+  <br /><br />
+  <button onclick="downloadReport('excel')">Download Excel Report</button>
+  <button onclick="downloadReport('pdf')">Download PDF Report</button>
+</section>
+
+
+  <!-- REPORTS SECTION -->
+  <section id="reports">
+    <h2>Reports</h2>
+    <button onclick="downloadReport('excel')">Download Weekly Excel</button>
+    <button onclick="downloadReport('pdf')">Download Weekly PDF</button>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
