@@ -1,6 +1,9 @@
 // ✅ Change this to your Render API base URL
 // Example: const apiUrl = "https://vending-tracker.onrender.com/api";
-const apiUrl = "https://YOUR-RENDER-BACKEND-URL/api";
+const apiUrl =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3000/api"
+    : "https://vending-tracker.onrender.com/api";
 
 // --- Load Items ---
 async function loadItems() {
