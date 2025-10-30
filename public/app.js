@@ -4,7 +4,7 @@
 
 // 🔗 Auto-detect backend (local or deployed)
 const localURL = "http://localhost:3000";
-const renderURL = "https://vending-tracker.onrender.com"; // 👈 Replace with your Render backend URL
+const renderURL = "https://vending-tracker-backend.koyeb.app/api"; // 👈 Replace with your Render backend URL
 const apiUrl = window.location.hostname === "localhost" ? localURL : renderURL;
 
 // ------------------------------
